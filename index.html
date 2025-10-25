@@ -351,6 +351,90 @@
                 color: #000; 
             }
         }
+        
+        /* --- REGRAS DE RESPONSIVIDADE (MOBILE) --- */
+        @media (max-width: 768px) {
+            
+            /* 1. HEADER E NAVEGAÇÃO */
+            header {
+                flex-direction: column; /* Empilha logo e nav */
+                padding: 15px 10px;
+                text-align: center;
+            }
+            
+            nav {
+                margin-top: 10px;
+                display: flex;
+                flex-wrap: wrap; /* Permite que os links quebrem a linha */
+                justify-content: center;
+            }
+            nav a {
+                padding: 8px 10px;
+                margin: 5px 5px; /* Mais espaço entre os links */
+                font-size: 0.9em;
+            }
+            .user-info {
+                margin-top: 10px;
+            }
+            
+            /* 2. CONTEÚDO PRINCIPAL E TÍTULO */
+            main {
+                padding: 10px 15px;
+            }
+            .page-title {
+                font-size: 1.2em; /* Reduz o tamanho do título da página */
+                margin-bottom: 20px;
+            }
+
+            /* 3. DASHBOARD STATS */
+            .dashboard-stats {
+                flex-direction: column; /* Empilha os cards */
+                gap: 10px;
+            }
+            .stat-card {
+                flex: none; /* Remove a flexibilidade */
+                width: 100%;
+            }
+
+            /* 4. FORMULÁRIO DE CADASTRO */
+            .cadastro-form {
+                grid-template-columns: 1fr; /* Muda para uma única coluna */
+                gap: 15px;
+            }
+            .btn-azul {
+                grid-column: 1 / 2; /* Faz o botão ocupar a largura total */
+                margin-top: 10px;
+            }
+
+            /* 5. TABELAS (Garantir Rolagem) */
+            /* Aplica rolagem horizontal nos containers da tabela, pois a tabela tem min-width de 800px*/
+            .table-section, .movimentacoes-section {
+                overflow-x: auto; 
+            }
+            
+            /* Ajuste para botões na tabela (para não quebrar a linha) */
+            .table-section table td:last-child {
+                white-space: normal; /* Permite que os botões quebrem em duas linhas dentro da célula */
+            }
+
+            /* 6. LOGIN BOX */
+            .login-box {
+                width: 90%; /* Ocupa mais espaço na tela */
+                padding: 20px;
+            }
+            
+            /* 7. RODAPÉ */
+            footer {
+                font-size: 0.9em;
+            }
+            
+            /* 8. Filtros */
+            .table-section div[style*="display: flex;"] {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 10px !important;
+            }
+        }
     </style>
     </head>
 <body>
@@ -1174,5 +1258,4 @@
         });
     </script>
     </body>
-
 </html>
