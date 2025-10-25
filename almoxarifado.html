@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Almoxarifado - Secretaria de Educação</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Cores Principais em Azul */
+        :root {
+            --cor-primaria: #007bff;
+            --cor-secundaria: #0056b3;
+            --cor-header: #0d47a1;
+            --cor-borda: #dee2e6;
+            --cor-sucesso: #28a745;
+            --cor-alerta: #ffc107;
+            --cor-falta: #dc3545;
+            --cor-acao: #17a2b8;
+            --cor-entrada: #28a745;
+            --cor-saida: #dc3545;
+        }
+
+        /* Estrutura do Cabeçalho */
+        header {
+            background-color: var(--cor-header);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo { 
+            font-size: 1.5em; 
+            font-weight: 700; 
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            margin: 0 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        nav a:hover, nav a.active { background-color: var(--cor-secundaria); }
+
+        /* Conteúdo Principal */
+        main {
+            padding: 20px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .page-title {
+            color: var(--cor-primaria);
+            border-bottom: 2px solid var(--cor-borda);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        /* Dashboard Stats */
+        .dashboard-container {
+            margin-bottom: 40px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-stats {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .stat-card {
+            padding: 15px;
+            border-radius: 8px;
+            flex: 1;
+            text-align: center;
+            border: 1px solid var(--cor-borda);
+            background-color: #f8f8ff;
+        }
+        .stat-card h2 { font-size: 0.9em; color: #6c757d; margin-bottom: 5px; }
+        .stat-card .number { font-size: 1.8em; font-weight: 700; }
+        .icon-azul { font-size: 1.5em; color: var(--cor-primaria); margin-bottom: 5px; }
+        .highlight-green { color: var(--cor-sucesso); }
+        .highlight-red { color: var(--cor-falta); }
+        .highlight-blue { color: var(--cor-primaria); }
+        
+        /* NOVO: Destaque Amarelo para Atenção */
+        .highlight-yellow { color: var(--cor-alerta); }
+
+
+        /* Remoção do espaço para o botão de atualização */
+        .btn-atualizar-container {
+            display: none; 
+        }
+
+        /* Estilos da Tabela de Movimentações */
+        .movimentacao-entrada { color: var(--cor-entrada); font-weight: 700; }
+        .movimentacao-saida { color: var(--cor-saida); font-weight: 700; }
+
+
+        /* Manutenção dos outros estilos */
+        .table-section, .form-container, .movimentacoes-section {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .table-section h2, .form-container h2, .movimentacoes-section h2 {
+            color: var(--cor-secundaria);
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            border-bottom: 1px solid var(--cor-borda);
+            padding-bottom: 10px;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        table th, table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--cor-borda); }
+        table th { background-color: var(--cor-primaria); color: white; font-weight: 400; text-transform: uppercase; }
+        table tr:hover { background-color: #e9f5ff; }
+        .status-ok { color: var(--cor-sucesso); font-weight: 700; }
+        .status-alerta { color: var(--cor-alerta); font-weight: 700; }
+        .status-falta { color: var(--cor-falta); font-weight: 700; }
+        .qtde { font-weight: 700; }
+        .btn-ajustar {
+            padding: 5px 10px;
+            background-color: var(--cor-acao);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+        }
+        .btn-ajustar:hover { background-color: var(--cor-primaria); }
+        
+        /* Estilo para botão de Excluir */
+        .btn-excluir {
+            padding: 5px 10px;
+            background-color: var(--cor-falta);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+            margin-left: 5px; 
+        }
+        .btn-excluir:hover {
+            background-color: #bd2130;
+        }
+        
+        /* Ajuste para botões na tabela de estoque */
+        .table-section table td:last-child {
+            white-space: nowrap; 
+        }
+
+        .cadastro-form {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 5px; font-weight: 700; color: #555; }
+        .form-group input, .form-group select { padding: 10px; border: 1px solid var(--cor-borda); border-radius: 5px; }
+        .btn-azul {
+            grid-column: 3 / 4;
+            padding: 10px 20px;
+            background-color: var(--cor-entrada);
+            color: white;
+            border: none;
+            border-radius: 5-px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+            font-weight: 700;
+        }
+        .btn-azul:hover { background-color: #1e7e34; }
+        footer {
+            background-color: #343a40;
+            color: #f8f9fa;
+            text-align: center;
+            padding: 15px;
+            /* Garante que o rodapé fica na parte inferior */
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        main {
+            padding-bottom: 80px; /* Espaço para o rodapé fixo */
+        }
+
+        /* --- NOVOS ESTILOS PARA LOGIN --- */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 350px;
+            text-align: center;
+        }
+
+        .login-box h2 {
+            color: var(--cor-primaria);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--cor-borda);
+            padding-bottom: 10px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid var(--cor-borda);
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--cor-primaria);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 700;
+            transition: background-color 0.3s;
+        }
+
+        .login-box button:hover {
+            background-color: var(--cor-secundaria);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- INDICADOR DE CARREGAMENTO (SPINNER) --- */
+        .loading-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: none; /* Inicia oculto */
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1001;
+            color: var(--cor-secundaria);
+            font-size: 1.2em;
+            font-weight: 700;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid var(--cor-primaria);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 2s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* NOVO ESTILO PARA BOTÃO DE IMPRIMIR */
+        .btn-imprimir {
+            padding: 8px 15px;
+            background-color: #6c757d; /* Cinza */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+            font-weight: 700;
+            margin-left: auto; /* Alinha à direita */
+        }
+        .btn-imprimir:hover {
+            background-color: #5a6268;
+        }
+        
+        /* Estilos de impressão */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #estoque-print-area, #estoque-print-area * {
+                visibility: visible;
+            }
+            #estoque-print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 20px;
+            }
+            .btn-imprimir {
+                display: none;
+            }
+            /* Garantir que a tabela e o cabeçalho sejam formatados corretamente */
+            #estoque-print-area table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            #estoque-print-area table th, #estoque-print-area table td { 
+                padding: 8px 12px; 
+                text-align: left; 
+                border: 1px solid #000;
+            }
+            #estoque-print-area table th { 
+                background-color: #ccc; 
+                color: #000; 
+            }
+        }
+        
+        /* --- REGRAS DE RESPONSIVIDADE (MOBILE) --- */
+        @media (max-width: 768px) {
+            
+            /* 1. HEADER E NAVEGAÇÃO */
+            header {
+                flex-direction: column; /* Empilha logo e nav */
+                padding: 15px 10px;
+                text-align: center;
+            }
+            
+            nav {
+                margin-top: 10px;
+                display: flex;
+                flex-wrap: wrap; /* Permite que os links quebrem a linha */
+                justify-content: center;
+            }
+            nav a {
+                padding: 8px 10px;
+                margin: 5px 5px; /* Mais espaço entre os links */
+                font-size: 0.9em;
+            }
+            .user-info {
+                margin-top: 10px;
+            }
+            
+            /* 2. CONTEÚDO PRINCIPAL E TÍTULO */
+            main {
+                padding: 10px 15px;
+            }
+            .page-title {
+                font-size: 1.2em; /* Reduz o tamanho do título da página */
+                margin-bottom: 20px;
+            }
+
+            /* 3. DASHBOARD STATS */
+            .dashboard-stats {
+                flex-direction: column; /* Empilha os cards */
+                gap: 10px;
+            }
+            .stat-card {
+                flex: none; /* Remove a flexibilidade */
+                width: 100%;
+            }
+
+            /* 4. FORMULÁRIO DE CADASTRO */
+            .cadastro-form {
+                grid-template-columns: 1fr; /* Muda para uma única coluna */
+                gap: 15px;
+            }
+            .btn-azul {
+                grid-column: 1 / 2; /* Faz o botão ocupar a largura total */
+                margin-top: 10px;
+            }
+
+            /* 5. TABELAS (Garantir Rolagem) */
+            /* Aplica rolagem horizontal nos containers da tabela, pois a tabela tem min-width de 800px*/
+            .table-section, .movimentacoes-section {
+                overflow-x: auto; 
+            }
+            
+            /* Ajuste para botões na tabela (para não quebrar a linha) */
+            .table-section table td:last-child {
+                white-space: normal; /* Permite que os botões quebrem em duas linhas dentro da célula */
+            }
+
+            /* 6. LOGIN BOX */
+            .login-box {
+                width: 90%; /* Ocupa mais espaço na tela */
+                padding: 20px;
+            }
+            
+            /* 7. RODAPÉ */
+            footer {
+                font-size: 0.9em;
+            }
+            
+            /* 8. Filtros */
+            .table-section div[style*="display: flex;"] {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 10px !important;
+            }
+        }
+    </style>
+    </head>
+<body>
+    
+    <div id="login-overlay" class="overlay">
+        <div class="login-box">
+            <h2><i class="fas fa-lock"></i> Acesso ao Almoxarifado</h2>
+            <input type="text" id="login-nome" placeholder="Seu Nome de Usuário" required>
+            <input type="password" id="login-senha" placeholder="Senha" required> 
+            <button onclick="fazerLogin()">Entrar</button>
+        </div>
+    </div>
+
+    <div id="loading-indicator" class="loading-indicator">
+        <div class="spinner"></div>
+        <p>Carregando a Aplicação...</p>
+        <p style="font-size: 0.9em; font-weight: 400; margin-top: 5px;">Aguarde. O acesso inicial ao servidor pode levar alguns instantes.</p>
+    </div>
+    <header>
+        <div class="logo">
+            <i class="fas fa-boxes"></i> Almoxarifado Digital
+        </div>
+        
+        <nav>
+            <a href="#estoque" class="active"><i class="fas fa-warehouse"></i> Estoque Atual</a>
+            <a href="#cadastro"><i class="fas fa-plus"></i> Novo Cadastro</a>
+            <a href="#historico"><i class="fas fa-history"></i> Histórico</a>
+        </nav>
+        <div class="user-info">
+            <i class="fas fa-user-circle"></i> <span id="user-display-name">Olá, Visitante</span>
+        </div>
+    </header>
+
+    <main id="main-content" class="hidden">
+        <h1 class="page-title">Controle de Materiais - Secretaria de Educação de Demerval Lobão</h1>
+
+        <section class="dashboard-container">
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <i class="fas fa-layer-group icon-azul"></i>
+                    <h2>Produtos Cadastrados</h2>
+                    <p class="number highlight-blue" id="total-itens">0</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-check-circle icon-azul"></i>
+                    <h2>Produtos OK</h2>
+                    <p class="number highlight-green" id="alertas-ok">0</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-exclamation-triangle icon-azul"></i>
+                    <h2>Produtos Atenção</h2>
+                    <p class="number highlight-yellow" id="alertas-atencao">0</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-times-circle icon-azul"></i>
+                    <h2>Produtos em Falta</h2>
+                    <p class="number highlight-red" id="alertas-falta">0</p>
+                </div>
+            </div>
+            <div class="btn-atualizar-container">
+                </div>
+        </section>
+
+        <section class="form-container" id="cadastro">
+            <h2><i class="fas fa-box-open"></i> Cadastrar Novo Produto</h2>
+            <form id="form-cadastro" class="cadastro-form">
+                <div class="form-group">
+                    <label for="new_codigo">Código:</label>
+                    <input type="text" id="new_codigo" name="new_codigo" placeholder="Ex: 005-M01" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_produto">Nome do Produto:</label>
+                    <input type="text" id="new_produto" name="new_produto" placeholder="Ex: Marcador de Quadro Branco" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_unidade">Unidade:</label>
+                    <input type="text" id="new_unidade" name="new_unidade" placeholder="Ex: UN, PCT, CX" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_estoque_inicial">Estoque Inicial:</label>
+                    <input type="number" id="new_estoque_inicial" name="new_estoque_inicial" min="0" value="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_estoque_minimo">Estoque Mínimo:</label>
+                    <input type="number" id="new_estoque_minimo" name="new_estoque_minimo" min="0" value="50" required>
+                </div>
+                <button type="button" class="btn-azul" onclick="cadastrarProduto()"><i class="fas fa-plus"></i> Cadastrar Produto</button>
+            </form>
+        </section>
+
+        <section id="estoque" class="table-section">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2><i class="fas fa-warehouse"></i> Estoque Atual de Materiais</h2>
+                <button class="btn-imprimir" onclick="imprimirEstoque()"><i class="fas fa-print"></i> Imprimir</button>
+            </div>
+            
+            <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 20px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <label for="filtro-mes-estoque" style="font-weight: 700;">Estatísticas do Mês/Ano:</label>
+                    <select id="filtro-mes-estoque" onchange="carregarEstoque()"></select>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <label for="filtro-status-estoque" style="font-weight: 700;">Filtrar por Status:</label>
+                    <select id="filtro-status-estoque" onchange="renderizarTabelaEstoque()">
+                        <option value="">Todos</option>
+                        <option value="ok">OK</option>
+                        <option value="alerta">Atenção</option>
+                        <option value="falta">Falta</option>
+                    </select>
+                </div>
+                </div>
+
+            <div id="estoque-print-area">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cód.</th>
+                            <th>Produto</th>
+                            <th>Estoque Atual</th>
+                            <th>Estoque Mínimo</th>
+                            <th>Entradas (Mês)</th> 
+                            <th>Saídas (Mês)</th>   
+                            <th>Status</th>
+                            <th>Ações</th>          
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-estoque">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="historico" class="movimentacoes-section">
+            <h2><i class="fas fa-list-alt"></i> Histórico de Movimentações</h2>
+            
+            <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                <label for="filtro-mes-mov" style="font-weight: 700;">Filtrar por Mês:</label>
+                <select id="filtro-mes-mov" onchange="renderizarTabelaMovimentacoes()"></select>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data/Hora</th>
+                        <th>Produto</th>
+                        <th>Tipo</th>
+                        <th>Quantidade</th>
+                        <th>Observação</th>
+                        <th>Ação</th> 
+                    </tr>
+                </thead>
+                <tbody id="tabela-movimentacoes">
+                    </tbody>
+            </table>
+        </section>
+        
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Secretaria Municipal de Educação. Controle de Almoxarifado.</p>
+    </footer>
+
+    <script>
+        // ************************************************************************************
+        // *** URL DE PRODUÇÃO DO BACK-END (Render) ***
+        // *** SE VOCÊ MUDOU O NOME DO SEU SERVIÇO, ATUALIZE ESTA URL! ***
+        // ************************************************************************************
+        const API_BASE_URL = 'https://almoxarifado-mcqr.onrender.com';
+        
+        let movimentacoes = []; 
+        let estoqueAtual = [];  
+        
+        // --- Variável para a Senha Fixa ---
+        const SENHA_FIXA = '2719';
+        const STORAGE_KEY_USER = 'almoxarifado_user'; 
+
+        // --- Função de Login ---
+        function fazerLogin() {
+            const nomeInput = document.getElementById('login-nome');
+            const senhaInput = document.getElementById('login-senha');
+            
+            const nome = nomeInput.value.trim();
+            const senha = senhaInput.value.trim();
+
+            if (!nome) {
+                alert("Por favor, digite seu nome de usuário.");
+                return;
+            }
+
+            if (senha === SENHA_FIXA) {
+                // Login bem-sucedido
+                iniciarAplicacao(nome);
+            } else {
+                alert("Senha incorreta. Por favor, tente novamente.");
+                senhaInput.value = ''; 
+            }
+        }
+
+        // --- Função para Iniciar a Aplicação Após o Login (CORRIGIDO com Spinner) ---
+        async function iniciarAplicacao(nomeUsuario) {
+            const mainContent = document.getElementById('main-content');
+            const loginOverlay = document.getElementById('login-overlay');
+            const loadingIndicator = document.getElementById('loading-indicator');
+
+            // 1. Oculta o overlay de login
+            loginOverlay.classList.add('hidden');
+            
+            // 2. Exibe o indicador de carregamento
+            loadingIndicator.style.display = 'flex';
+
+            // 3. Atualiza o nome de exibição no cabeçalho
+            document.getElementById('user-display-name').textContent = `Olá, ${nomeUsuario}`;
+
+            try {
+                // 4. Carrega os dados (Rotina de inicialização)
+                await carregarMovimentacoes();
+                popularFiltros(); 
+                // A função carregarEstoque agora apenas popula o array estoqueAtual
+                await carregarEstoqueDados(); 
+                // Nova função que renderiza a tabela com base nos filtros
+                renderizarTabelaEstoque(); 
+                renderizarTabelaMovimentacoes();
+
+                // 5. Exibe o conteúdo principal se tudo deu certo
+                mainContent.classList.remove('hidden');
+                
+            } catch (error) {
+                // Em caso de falha grave na inicialização (após o retry), volta para o login
+                console.error("Falha fatal ao carregar dados iniciais:", error);
+                
+                // Verifica se é um erro de conexão persistente
+                if (error.message.includes('Failed to fetch') || error.message.includes('Erro de rede')) {
+                     alert("Erro de conexão persistente. O servidor pode estar inativo ou a URL da API pode estar incorreta. Verifique o console do navegador para mais detalhes.");
+                } else {
+                     alert(`Não foi possível carregar os dados iniciais do servidor: ${error.message}. Por favor, tente novamente.`);
+                }
+                
+                loginOverlay.classList.remove('hidden');
+                mainContent.classList.add('hidden');
+            } finally {
+                // 6. Esconde o indicador de carregamento, mesmo se houver erro
+                loadingIndicator.style.display = 'none';
+            }
+        }
+
+        // --- 0. FUNÇÕES DE PERSISTÊNCIA (AGORA USANDO API) ---
+        
+        // Função auxiliar para requisições com lógica de Retry
+        async function fazerRequisicao(url, metodo = 'GET', dados = null, attempt = 1) {
+            try {
+                const config = {
+                    method: metodo,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+                if (dados) {
+                    config.body = JSON.stringify(dados);
+                }
+
+                const response = await fetch(url, config);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    let errorMessage = `Erro de rede: ${response.status}`;
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.message || errorMessage;
+                    } catch (e) {
+                        errorMessage = errorMessage + ` (Resposta: ${errorText.substring(0, 50)}...)`;
+                    }
+
+                    throw new Error(errorMessage);
+                }
+                
+                return response.json();
+            } catch (error) {
+                // SE FOR ERRO DE REDE PURO (FAILED TO FETCH) E FOR A PRIMEIRA TENTATIVA
+                if ((error.message.includes('Failed to fetch') || error.message.includes('rede')) && attempt === 1) {
+                    console.warn(`[RETRY] Tentativa 1 falhou. Tentando novamente em 5 segundos... (Servidor Render em sleep?)`);
+                    
+                    // Espera 5 segundos para dar tempo do servidor Render "acordar"
+                    await new Promise(resolve => setTimeout(resolve, 5000));
+                    
+                    // Tenta a requisição novamente (tentativa 2)
+                    return fazerRequisicao(url, metodo, dados, 2);
+                }
+
+                // Se não for um erro de 'Failed to fetch' ou for a segunda tentativa (retry)
+                console.error("Erro na requisição (Tentativa Final):", error);
+                
+                throw error; // Propaga o erro para ser pego pela função iniciarAplicacao
+            }
+        }
+        // *****************************************************************
+
+
+        // --- Carrega MOVIMENTAÇÕES da API ---
+        async function carregarMovimentacoes() {
+            const dados = await fazerRequisicao(`${API_BASE_URL}/api/movimentacoes`);
+            
+            if (dados && dados.movimentacoes) {
+                movimentacoes = dados.movimentacoes.map(mov => {
+                    // Garante que a data é um objeto Date para manipulação
+                    mov.data = new Date(mov.data); 
+                    mov.id = mov._id;
+                    return mov;
+                });
+            }
+        }
+        
+        // --- NOVO: Carrega APENAS os dados do Estoque da API para o array local ---
+        async function carregarEstoqueDados() {
+            const dados = await fazerRequisicao(`${API_BASE_URL}/api/estoque`);
+            if (dados && dados.estoque) {
+                estoqueAtual = dados.estoque; 
+            }
+        }
+        
+        // --- Antiga 'carregarEstoque' renomeada para 'renderizarTabelaEstoque' e atualizada para usar filtro ---
+        function renderizarTabelaEstoque() {
+            const tabelaEstoqueHTML = document.getElementById('tabela-estoque');
+            tabelaEstoqueHTML.innerHTML = ''; 
+
+            const filtroEstatistica = document.getElementById('filtro-mes-estoque');
+            let anoEstatistica, mesEstatistica;
+            
+            if (filtroEstatistica.value) {
+                [anoEstatistica, mesEstatistica] = filtroEstatistica.value.split('-').map(Number);
+            } else {
+                const hoje = new Date();
+                anoEstatistica = hoje.getFullYear();
+                mesEstatistica = hoje.getMonth();
+            }
+            
+            const filtroStatus = document.getElementById('filtro-status-estoque').value;
+
+            estoqueAtual.forEach(prod => {
+                const statusData = calcularStatus(prod.estoqueAtual, prod.estoqueMinimo);
+                
+                // Lógica de Filtragem de Status
+                if (filtroStatus && filtroStatus !== '' && statusData.status !== filtroStatus) { // CORRIGIDO: usa statusData.status
+                    return; // Ignora este produto se não corresponder ao filtro de status
+                }
+                
+                const newRow = tabelaEstoqueHTML.insertRow();
+                // Garante que o ID do mongo (_id) é usado para referência se estiver disponível
+                newRow.setAttribute('data-id', prod._id || prod.id); 
+                newRow.setAttribute('data-codigo', prod.codigo);
+                newRow.setAttribute('data-minimo', prod.estoqueMinimo);
+                
+                const celulaEstoque = document.createElement('td');
+                celulaEstoque.classList.add('qtde');
+                celulaEstoque.setAttribute('data-estoque', prod.estoqueAtual); 
+                celulaEstoque.textContent = prod.estoqueAtual;
+
+                const movsMes = calcularMovimentacoesDoProduto(prod.codigo, mesEstatistica, anoEstatistica);
+
+                const celulaStatus = document.createElement('td');
+                celulaStatus.classList.add(statusData.class);
+                celulaStatus.innerHTML = statusData.html;
+                
+                const celulaAcoes = document.createElement('td');
+                celulaAcoes.innerHTML = `
+                    <button class="btn-ajustar" onclick="abrirAjuste(this)">Ajustar</button>
+                    <button class="btn-excluir" onclick="excluirProduto(this)"><i class="fas fa-trash"></i> Excluir</button>
+                `;
+                
+                const unidade = prod.unidade || 'un'; 
+
+                newRow.innerHTML = `
+                    <td>${prod.codigo}</td>
+                    <td>${prod.nome}</td>
+                `;
+                newRow.appendChild(celulaEstoque);
+                newRow.innerHTML += `
+                    <td>${prod.estoqueMinimo}</td>
+                    <td>+${movsMes.entradas} ${unidade}</td>
+                    <td>-${movsMes.saidas} ${unidade}</td>
+                `;
+                newRow.appendChild(celulaStatus);
+                newRow.appendChild(celulaAcoes);
+            });
+            calcularEAtualizarDashboard();
+        }
+        
+        // --- Função carregarEstoque chama apenas a renderização ---
+        function carregarEstoque() {
+            renderizarTabelaEstoque();
+        }
+        
+        function calcularStatus(estoqueAtual, estoqueMinimo) {
+            if (estoqueAtual >= estoqueMinimo * 1.5) { 
+                return { class: 'status-ok', html: '<i class="fas fa-check-circle"></i> OK', status: 'ok' };
+            } else if (estoqueAtual >= estoqueMinimo) { 
+                return { class: 'status-alerta', html: '<i class="fas fa-exclamation-triangle"></i> Atenção', status: 'alerta' };
+            } else { 
+                return { class: 'status-falta', html: '<i class="fas fa-times-circle"></i> Falta', status: 'falta' };
+            }
+        }
+
+        function calcularMovimentacoesDoProduto(codProduto, mes, ano) {
+            let entradas = 0;
+            let saidas = 0;
+            
+            movimentacoes.forEach(mov => {
+                const dataMov = new Date(mov.data);
+                if (mov.codProduto === codProduto && dataMov.getMonth() === mes && dataMov.getFullYear() === ano) { 
+                    if (mov.qtde > 0) {
+                        entradas += mov.qtde;
+                    } else {
+                        saidas += Math.abs(mov.qtde);
+                    }
+                }
+            });
+            return { entradas, saidas };
+        }
+
+
+        // --- 1. FUNÇÃO PRINCIPAL PARA ATUALIZAR O DASHBOARD (MODIFICADA) ---
+        function calcularEAtualizarDashboard() {
+            let alertasFalta = 0;
+            let alertasAtencao = 0;
+            let alertasOk = 0;
+
+            estoqueAtual.forEach(prod => {
+                const status = calcularStatus(prod.estoqueAtual, prod.estoqueMinimo).status;
+                
+                if (status === 'falta') {
+                    alertasFalta++;
+                } else if (status === 'alerta') {
+                    alertasAtencao++;
+                } else { // status === 'ok'
+                    alertasOk++;
+                }
+            });
+
+            document.getElementById('total-itens').textContent = estoqueAtual.length;
+            // ATUALIZADOS: Usando os novos IDs
+            document.getElementById('alertas-ok').textContent = alertasOk;
+            document.getElementById('alertas-atencao').textContent = alertasAtencao;
+            document.getElementById('alertas-falta').textContent = alertasFalta;
+        }
+
+
+        // --- 2. FUNÇÃO PARA ATUALIZAR ESTOQUE E STATUS (Otimizada para ajuste) ---
+        function atualizarEstoqueNaTabela(celulaEstoque, novoEstoque, codProduto) {
+            const linha = celulaEstoque.closest('tr');
+            const estoqueMinimo = parseInt(linha.getAttribute('data-minimo')); 
+            const celulaStatus = linha.children[6]; 
+
+            celulaEstoque.textContent = novoEstoque;
+            celulaEstoque.setAttribute('data-estoque', novoEstoque);
+            
+            const produtoNoArray = estoqueAtual.find(p => p.codigo === codProduto);
+            if(produtoNoArray) {
+                produtoNoArray.estoqueAtual = novoEstoque;
+            }
+            
+            const unidade = produtoNoArray ? produtoNoArray.unidade : 'un'; 
+
+            const filtroEstatistica = document.getElementById('filtro-mes-estoque');
+            let anoEstatistica, mesEstatistica;
+            if (filtroEstatistica.value) {
+                [anoEstatistica, mesEstatistica] = filtroEstatistica.value.split('-').map(Number);
+            } else {
+                const hoje = new Date();
+                anoEstatistica = hoje.getFullYear();
+                mesEstatistica = hoje.getMonth();
+            }
+
+            const movsMes = calcularMovimentacoesDoProduto(codProduto, mesEstatistica, anoEstatistica);
+            linha.children[4].textContent = `+${movsMes.entradas} ${unidade}`; 
+            linha.children[5].textContent = `-${movsMes.saidas} ${unidade}`;   
+
+            const statusData = calcularStatus(novoEstoque, estoqueMinimo);
+            celulaStatus.className = ''; 
+            celulaEstoque.setAttribute('data-estoque', novoEstoque); 
+            celulaStatus.classList.add(statusData.class);
+            celulaStatus.innerHTML = statusData.html;
+            
+            calcularEAtualizarDashboard(); 
+            // Re-renderiza a tabela para aplicar o filtro de status, caso tenha mudado
+            renderizarTabelaEstoque();
+        }
+
+        // --- 3. FUNÇÃO PARA ABRIR O AJUSTE DE ESTOQUE (AGORA FAZENDO CHAMADA À API) ---
+        async function abrirAjuste(botao) {
+            const linha = botao.closest('tr');
+            const codProduto = linha.getAttribute('data-codigo');
+            const nomeProduto = linha.children[1].textContent;
+            const celulaEstoque = linha.querySelector('.qtde');
+            let estoqueAtualLocal = parseInt(celulaEstoque.getAttribute('data-estoque'));
+            
+            const produtoNoArray = estoqueAtual.find(p => p.codigo === codProduto);
+            const unidade = produtoNoArray ? produtoNoArray.unidade : 'un';
+
+            const acao = prompt(`AJUSTAR ESTOQUE de "${nomeProduto}" (Atual: ${estoqueAtualLocal} ${unidade}):\n\nDigite a operação e a quantidade:\nEx: +50 (ENTRADA) ou -10 (SAÍDA)`);
+
+            if (acao === null || acao.trim() === "") return;
+
+            const match = acao.trim().match(/^([+-])(\d+)$/);
+
+            if (!match) {
+                alert("Formato inválido. Use '+N' para adicionar ou '-N' para remover, onde N é um número.");
+                return;
+            }
+
+            const tipoSinal = match[1];
+            const quantidadeAbs = parseInt(match[2]);
+            const observacao = prompt("Motivo da movimentação (Obrigatório):");
+            
+            if (!observacao || observacao.trim() === "") {
+                alert("O motivo da movimentação é obrigatório para auditoria.");
+                return;
+            }
+            
+            let novoEstoque;
+            let tipoMov = '';
+            let quantidadeFinal = 0;
+
+            if (tipoSinal === '+') {
+                novoEstoque = estoqueAtualLocal + quantidadeAbs;
+                tipoMov = 'Entrada';
+                quantidadeFinal = quantidadeAbs;
+            } else if (tipoSinal === '-') {
+                if (quantidadeAbs > estoqueAtualLocal) {
+                    alert(`ERRO: Estoque insuficiente. Apenas ${estoqueAtualLocal} ${unidade} em estoque.`);
+                    return;
+                }
+                novoEstoque = estoqueAtualLocal - quantidadeAbs;
+                tipoMov = 'Saída';
+                quantidadeFinal = -quantidadeAbs; 
+            }
+
+            const dadosMovimentacao = {
+                cod: codProduto,
+                tipo: tipoMov,
+                qtde: quantidadeFinal, 
+                obs: observacao
+            };
+            
+            const result = await fazerRequisicao(`${API_BASE_URL}/api/movimentacoes`, 'POST', dadosMovimentacao);
+
+            if (result && result.movimentacaoCriada) { // Alterado para 'movimentacaoCriada' conforme index.js
+                
+                result.movimentacaoCriada.data = new Date(result.movimentacaoCriada.data);
+                movimentacoes.push(result.movimentacaoCriada);
+
+                atualizarEstoqueNaTabela(celulaEstoque, novoEstoque, codProduto); 
+                
+                renderizarTabelaMovimentacoes();
+
+                alert(`Ajuste de estoque efetuado: ${tipoSinal}${quantidadeAbs} ${unidade}. Novo Estoque: ${novoEstoque} ${unidade}`);
+            } 
+        }
+        
+        // --- 4. FUNÇÃO PARA CADASTRAR NOVO PRODUTO (AGORA USANDO API) ---
+        async function cadastrarProduto() {
+            const codigo = document.getElementById('new_codigo').value.trim();
+            const produto = document.getElementById('new_produto').value.trim();
+            const unidade = document.getElementById('new_unidade').value.trim();
+            const estoqueInicial = parseInt(document.getElementById('new_estoque_inicial').value);
+            const estoqueMinimo = parseInt(document.getElementById('new_estoque_minimo').value);
+
+            if (!codigo || !produto || !unidade || isNaN(estoqueInicial) || estoqueInicial < 0 || isNaN(estoqueMinimo) || estoqueMinimo < 0) {
+                alert("Preencha todos os campos do cadastro corretamente.");
+                return;
+            }
+            
+            if (estoqueAtual.find(p => p.codigo === codigo)) {
+                alert(`Erro: O produto com código ${codigo} já está cadastrado!`);
+                return;
+            }
+            
+            const novoProduto = {
+                codigo: codigo,
+                nome: produto, 
+                unidade: unidade,
+                estoqueInicial: estoqueInicial, 
+                estoqueMinimo: estoqueMinimo
+            };
+
+            const result = await fazerRequisicao(`${API_BASE_URL}/api/estoque`, 'POST', novoProduto);
+
+            if (result && result.produtoCriado) {
+                
+                // Recarrega tudo para garantir a sincronização após o cadastro
+                await carregarMovimentacoes(); 
+                await carregarEstoqueDados(); // Carrega os dados mais recentes
+                renderizarTabelaEstoque(); // Renderiza com os dados atualizados
+                renderizarTabelaMovimentacoes(); 
+                
+                alert(`Produto "${produto}" cadastrado com sucesso!`);
+                document.getElementById('form-cadastro').reset();
+            } 
+        }
+        
+        // --- 5. FUNÇÃO PARA EXCLUIR PRODUTO (AGORA USANDO API) ---
+        async function excluirProduto(button) {
+            const linha = button.closest('tr');
+            const codigo = linha.getAttribute('data-codigo');
+            const nomeProduto = linha.children[1].textContent;
+
+            if (confirm(`Tem certeza que deseja EXCLUIR o produto "${nomeProduto}" (Código: ${codigo})?\n\nESTA AÇÃO É IRREVERSÍVEL. O histórico de movimentações deste produto será mantido.`)) {
+                
+                const result = await fazerRequisicao(`${API_BASE_URL}/api/estoque/${codigo}`, 'DELETE');
+
+                if (result && result.message === "Produto excluído com sucesso") {
+                    
+                    // Remove da tabela visível (se a linha estiver na tabela filtrada)
+                    linha.remove();
+                    
+                    // Remove do array local
+                    estoqueAtual = estoqueAtual.filter(p => p.codigo !== codigo);
+
+                    calcularEAtualizarDashboard(); 
+                    
+                    alert(`Produto ${codigo} excluído com sucesso.`);
+                } 
+            }
+        }
+
+        // --- 6. FUNÇÃO PARA EXCLUIR MOVIMENTAÇÃO (AGORA USANDO API) ---
+        async function excluirMovimentacao(button) {
+            const linha = button.closest('tr');
+            const idParaExcluir = linha.getAttribute('data-mov-id'); 
+            
+            if (confirm("ATENÇÃO: Tem certeza que deseja EXCLUIR esta movimentação? Essa ação NÃO ajusta o estoque atual automaticamente e pode causar inconsistência. Você deve ajustar o estoque manualmente, se necessário.")) {
+                
+                const result = await fazerRequisicao(`${API_BASE_URL}/api/movimentacoes/${idParaExcluir}`, 'DELETE');
+
+                if (result && result.message === "Movimentação excluída com sucesso") {
+                    
+                    // Remove a movimentação do array local
+                    movimentacoes = movimentacoes.filter(mov => (mov._id || mov.id) !== idParaExcluir);
+
+                    renderizarTabelaMovimentacoes();
+                    
+                    // Recarrega o estoque para garantir que as estatísticas mensais (Entradas/Saídas) sejam recalculadas
+                    renderizarTabelaEstoque(); 
+
+                    alert("Movimentação excluída. Lembre-se de verificar e ajustar o 'Estoque Atual' na tabela manualmente!");
+                } 
+            }
+        }
+        
+        // --- FUNÇÃO DE IMPRESSÃO (MANTIDA) ---
+        function imprimirEstoque() {
+            const printArea = document.getElementById('estoque-print-area');
+            const filtroSelect = document.getElementById('filtro-mes-estoque');
+            const mesSelecionado = filtroSelect.options[filtroSelect.selectedIndex].text;
+            
+            // 1. Clonar a área de impressão
+            const printContent = printArea.cloneNode(true);
+            
+            // 2. Remover a coluna de 'Ações' do clone antes de imprimir
+            const tableRows = printContent.querySelectorAll('tr');
+            tableRows.forEach(row => {
+                // Remove o cabeçalho 'Ações'
+                const thAcoes = row.querySelector('th:last-child');
+                if (thAcoes && thAcoes.textContent === 'Ações') {
+                    thAcoes.remove();
+                }
+                // Remove a célula de 'Ações' do corpo
+                const tdAcoes = row.querySelector('td:last-child');
+                if (tdAcoes && tdAcoes.querySelector('.btn-ajustar')) { // Verifica se é a célula de ações
+                    tdAcoes.remove();
+                }
+            });
+            
+            // 3. Criar o cabeçalho de impressão
+            const headerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <h1 style="color: #007bff; border-bottom: 2px solid #ccc; padding-bottom: 5px;">Relatório de Estoque Atual</h1>
+                    <p><strong>Secretaria de Educação</strong></p>
+                    <p><strong>Período de Estatísticas (Entradas/Saídas):</strong> ${mesSelecionado}</p>
+                    <p><strong>Filtro de Status:</strong> ${document.getElementById('filtro-status-estoque').options[document.getElementById('filtro-status-estoque').selectedIndex].text}</p>
+                    <p><strong>Data de Emissão:</strong> ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}</p>
+                    <hr style="margin-top: 10px; border: 0; border-top: 1px solid #ccc;">
+                </div>
+            `;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Estoque Atual - ${mesSelecionado}</title>
+                    <style>
+                        body { font-family: 'Roboto', sans-serif; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+                        th { background-color: #eee; }
+                        .status-ok { color: #28a745; font-weight: 700; }
+                        .status-alerta { color: #ffc107; font-weight: 700; }
+                        .status-falta { color: #dc3545; font-weight: 700; }
+                    </style>
+                </head>
+                <body>
+                    ${headerHTML}
+                    ${printContent.innerHTML}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // --- FUNÇÕES DE RENDERIZAÇÃO E FILTRO (MANTIDA) ---
+
+        function popularFiltros() {
+            const selectEstat = document.getElementById('filtro-mes-estoque');
+            const selectMov = document.getElementById('filtro-mes-mov');
+            
+            selectEstat.innerHTML = ''; 
+            selectMov.innerHTML = '<option value="">Todos os Meses</option>';
+            
+            const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            
+            // --- NOVA LÓGICA DE FILTRO FIXO: Outubro/2025 a Dezembro/2026 ---
+            
+            const mesesParaAdicionar = [];
+            
+            // 1. Adiciona os meses de 2025 (Outubro (9) a Dezembro (11)) em ordem crescente
+            for (let mes = 9; mes <= 11; mes++) {
+                 mesesParaAdicionar.push({ ano: 2025, mes: mes });
+            }
+
+            // 2. Adiciona todos os meses de 2026 (Janeiro (0) a Dezembro (11)) em ordem crescente
+            for (let mes = 0; mes <= 11; mes++) {
+                mesesParaAdicionar.push({ ano: 2026, mes: mes });
+            }
+            
+            // O mês é representado por índice (0=Jan, 11=Dez)
+            // Define o default para o primeiro mês na lista: Outubro/2025 (2025-9)
+            let defaultOptionValue = '2025-9'; 
+
+            mesesParaAdicionar.forEach(({ ano, mes }) => {
+                const valor = `${ano}-${mes}`;
+                const texto = `${meses[mes]} / ${ano}`;
+                
+                // Adiciona ao filtro de Estoque (Estatísticas)
+                const optionEstat = document.createElement('option');
+                optionEstat.value = valor;
+                optionEstat.textContent = texto;
+                selectEstat.appendChild(optionEstat);
+                
+                // Adiciona ao filtro de Movimentações (Histórico)
+                const optionMov = document.createElement('option');
+                optionMov.value = valor;
+                optionMov.textContent = texto;
+                selectMov.appendChild(optionMov);
+            });
+            
+            selectEstat.value = defaultOptionValue;
+            
+            // Define o default para o Histórico.
+            if (document.querySelector(`#filtro-mes-mov option[value="${defaultOptionValue}"]`)) {
+                 selectMov.value = defaultOptionValue;
+            } else {
+                selectMov.value = ''; // Padrão 'Todos os Meses'
+            }
+            // --- FIM DA NOVA LÓGICA DE FILTRO FIXO ---
+        }
+        
+        function renderizarTabelaMovimentacoes() {
+            const tabelaMovimentacoes = document.getElementById('tabela-movimentacoes');
+            tabelaMovimentacoes.innerHTML = ''; 
+            
+            const filtroSelect = document.getElementById('filtro-mes-mov').value;
+            
+            let movimentacoesFiltradas = movimentacoes.slice();
+            
+            if (filtroSelect !== "") {
+                const [anoFiltro, mesFiltro] = filtroSelect.split('-').map(Number);
+                movimentacoesFiltradas = movimentacoesFiltradas.filter(mov => {
+                    const dataMov = new Date(mov.data);
+                    return dataMov.getFullYear() === anoFiltro && dataMov.getMonth() === mesFiltro;
+                });
+            }
+
+            movimentacoesFiltradas.sort((a, b) => b.data - a.data);
+            
+            movimentacoesFiltradas.forEach(mov => {
+                const newRow = tabelaMovimentacoes.insertRow();
+                newRow.setAttribute('data-mov-id', mov._id || mov.id); 
+                
+                const isEntrada = mov.qtde >= 0;
+
+                newRow.classList.add(isEntrada ? 'movimentacao-entrada' : 'movimentacao-saida');
+
+                const dataHoraFormatada = `${mov.data.toLocaleDateString('pt-BR')} ${mov.data.toLocaleTimeString('pt-BR')}`;
+                
+                const codigoProduto = mov.codProduto || 'N/A';
+                const produtoInfo = estoqueAtual.find(p => p.codigo === codigoProduto);
+                // Exibe o nome do produto no histórico, mesmo que o produto já tenha sido excluído do estoque
+                const nomeProdutoMov = produtoInfo ? produtoInfo.nome : mov.produtoNome || 'Produto Desconhecido';
+
+                const nomeCompletoExibicao = `${codigoProduto} - ${nomeProdutoMov}`; 
+
+                const quantidadeFormatada = `${mov.qtde > 0 ? '+' : ''}${mov.qtde}`;
+                
+                newRow.innerHTML = `
+                    <td>${dataHoraFormatada}</td>
+                    <td>${nomeCompletoExibicao}</td>
+                    <td>${mov.tipo.replace(' (Inicial)', '').replace('Cadastro', 'Cadastro (Estoque 0)')}</td>
+                    <td>${quantidadeFormatada}</td>
+                    <td><div style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${mov.obs}">${mov.obs}</div></td>
+                    <td><button class="btn-excluir" onclick="excluirMovimentacao(this)"><i class="fas fa-trash"></i> Excluir</button></td>
+                `;
+            });
+        }
+
+
+        // --- INICIALIZAÇÃO AO CARREGAR A PÁGINA ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Sempre exibe o overlay de login ao carregar a página
+            document.getElementById('login-overlay').classList.remove('hidden');
+            document.getElementById('login-nome').focus();
+        });
+    </script>
+    </body>
+</html>
